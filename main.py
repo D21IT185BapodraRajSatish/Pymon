@@ -83,7 +83,7 @@ class Record:
 
                 # Assign items to the location based on a predefined mapping
                 if location.name == "Playground":
-                    item = next((item for item in self.items if item.name == "magic potion"), None)
+                    item = next((item for item in self.items if item.name == "potion"), None)
                     if item:
                         location.items.append(item)
                 elif location.name == "Beach":
@@ -91,11 +91,10 @@ class Record:
                     if item:
                         location.items.append(item)
                 elif location.name == "School":
-                    item = next((item for item in self.items if item.name == "binoculars"), None)
+                    item = next((item for item in self.items if item.name == "binocular"), None)
                     if item:
                         location.items.append(item)
                 # Add additional conditions for other locations as needed
-
 
 
 class Pymon(Creature):
@@ -105,19 +104,14 @@ class Pymon(Creature):
         self.inventory = []
         self.current_location = None
 
-    def pick_item(self):
-        if self.current_location.items:
-            print("Items available to pick:")
-            for idx, item in enumerate(self.current_location.items):
-                if item:  # Check if item is not None
-                    print(f"{idx + 1}. {item.name} - {item.description}")
-            item_choice = int(input("Select an item to pick: ")) - 1
-            if 0 <= item_choice < len(self.current_location.items):
-                self.current_pymon.pick_item(self.current_location.items[item_choice])
-            else:
-                print("Invalid choice.")
+    def pick_item(self, item):
+        if self.current_location and item.pickable:
+            print(f"{self.name} picked up {item.name}.")
+            self.inventory.append(item)
+            if item in self.current_location.items:
+                self.current_location.items.remove(item)
         else:
-            print("No items available in this location.")
+            print(f"{item.name} cannot be picked up.")
 
     def use_item(self, item_name):
         item = next((i for i in self.inventory if i.name == item_name), None)
@@ -156,6 +150,8 @@ class Game:
         # Select a random starting location and Pymon
         self.current_pymon = random.choice(adoptable_pymons)
         self.current_location = random.choice(self.record.locations)
+        self.current_pymon.current_location = self.current_location  # Ensure Pymon location is set
+
         print(f"You are in {self.current_location.name}. {self.current_location.description}")
         print(f"Your current Pymon is {self.current_pymon.name}. Energy: {self.current_pymon.energy}")
 
@@ -206,6 +202,7 @@ class Game:
             next_location = self.current_location.doors[direction]
             if next_location:
                 self.current_location = next_location
+                self.current_pymon.current_location = next_location  # Update Pymon's location
                 print(f"You moved to {self.current_location.name}.")
             else:
                 print(f"There is no location to the {direction}.")
