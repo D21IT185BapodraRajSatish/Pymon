@@ -85,6 +85,21 @@ class Record:
                         if connected_location:
                             location.connect(direction, connected_location)
 
+                # Assign items to the location based on a predefined mapping
+                if location.name == "Playground":
+                    item = next((item for item in self.items if item.name == "potion"), None)
+                    if item:
+                        location.items.append(item)
+                elif location.name == "Beach":
+                    item = next((item for item in self.items if item.name == "apple"), None)
+                    if item:
+                        location.items.append(item)
+                elif location.name == "School":
+                    item = next((item for item in self.items if item.name == "binocular"), None)
+                    if item:
+                        location.items.append(item)
+                # Add additional conditions for other locations as needed
+
 class Pymon(Creature):
     def __init__(self, name, description):
         super().__init__(name, description, adoptable=True)
